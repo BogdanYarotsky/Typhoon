@@ -27,9 +27,9 @@ public partial class ChatHubProxy
         {
             _c = c;
         }
-        public Task SendMessage(string message, CancellationToken cancellationToken = default)
+        public Task SendMessageAsync(string message, CancellationToken cancellationToken = default)
         {
-            return _c.SendCoreAsync(nameof(SendMessage), [message], cancellationToken);
+            return _c.SendCoreAsync(nameof(SendMessageAsync), [message], cancellationToken);
         }
     }
     
@@ -41,9 +41,9 @@ public partial class ChatHubProxy
             _c = c;
         }
 
-        public Task SendMessage(string message, CancellationToken cancellationToken = default)
+        public Task SendMessageAsync(string message, CancellationToken cancellationToken = default)
         {
-            return _c.InvokeCoreAsync(nameof(SendMessage), [message], cancellationToken);
+            return _c.InvokeCoreAsync(nameof(SendMessageAsync), [message], cancellationToken);
         }
     }
 
@@ -54,9 +54,9 @@ public partial class ChatHubProxy
         {
             _c = c;
         }
-        public IDisposable ReceiveMessage(Func<string, Task> handler)
+        public IDisposable ReceiveMessageAsync(Func<string, Task> handler)
         {
-            return _c.On(nameof(ReceiveMessage), handler);
+            return _c.On(nameof(ReceiveMessageAsync), handler);
         }
     }
 }

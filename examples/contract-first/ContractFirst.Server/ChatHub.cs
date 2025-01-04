@@ -5,8 +5,8 @@ namespace ContractFirst.Server;
 
 public class ChatHub : Hub<IChatHubClient>, IChatHub
 {
-    public Task SendMessage(string message)
+    public Task SendMessageAsync(string message)
     {
-        return Clients.Others.ReceiveMessage(message);
+        return Clients.Others.ReceiveMessageAsync(message);
     }
 }

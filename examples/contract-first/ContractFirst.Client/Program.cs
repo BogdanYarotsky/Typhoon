@@ -7,10 +7,11 @@ await using var connection = new HubConnectionBuilder()
 
 var proxy = new ChatHubProxy(connection);
 
-proxy.On.ReceiveMessage(msg =>
+proxy.On.ReceiveMessageAsync(msg =>
 { 
     Console.WriteLine(msg);
     return Task.CompletedTask;
 });
 
-await proxy.Invoke.SendMessage("Hello World!");
+await proxy.Invoke.SendMessageAsync("Hello World!");
+await proxy.Send.SendMessageAsync("Hello World");
