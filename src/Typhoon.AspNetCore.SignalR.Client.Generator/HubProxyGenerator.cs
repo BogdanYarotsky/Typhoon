@@ -40,59 +40,110 @@ public class HubProxyGenerator : ISourceGenerator
         }
     }
 
-    private void GenerateProxyClass(StringBuilder source, INamedTypeSymbol classSymbol, ITypeSymbol hubType, ITypeSymbol clientType)
-    {
-        var ns = classSymbol.ContainingNamespace.ToDisplayString();
-        
-        source.AppendLine(
-        $$"""
-            using Microsoft.AspNetCore.SignalR.Client;
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
+private void GenerateProxyClass(StringBuilder source, INamedTypeSymbol classSymbol, ITypeSymbol hubType, ITypeSymbol clientType)
+{
+    var ns = classSymbol.ContainingNamespace.ToDisplayString();
+    source.AppendLine(
+    $$"""
+        using System;
+        using System.Threading;
+        using System.Threading.Tasks;
+        using Microsoft.AspNetCore.SignalR.Client;
 
-            namespace {{ns}}
+        namespace {{ns}}
+        {
+            public partial class {{classSymbol.Name}}
             {
-                public partial class {{classSymbol.Name}}
+                public interface IListener
                 {
-                    public Listener On { get; }
-                    public Invoker Invoke { get; }
-                    public Sender Send { get; }
+                    {{GenerateClientMethodsInterface(clientType)}}
+                }
             
-                    public {{classSymbol.Name}}(HubConnection connection)
-                    {
-                        On = new(connection);
-                        Send = new(connection);
-                        Invoke = new(connection);
-                    }
+                public interface ISender
+                {
+                    {{GenerateServerMethodsInterface(hubType)}}
+                }
             
-                    public class Sender
-                    {
-                        private readonly HubConnection _c;
-                        public Sender(HubConnection c) => _c = c;
+                public interface IInvoker
+                {
+                    {{GenerateServerMethodsInterface(hubType)}}
+                }
             
-                        {{GenerateServerMethods(hubType, "SendCoreAsync")}}
-                    }
-            
-                    public class Invoker
-                    {
-                        private readonly HubConnection _c;
-                        public Invoker(HubConnection c) => _c = c;
-            
-                        {{GenerateServerMethods(hubType, "InvokeCoreAsync")}}
-                    }
-            
-                    public class Listener
-                    {
-                        private readonly HubConnection _c;
-                        public Listener(HubConnection c) => _c = c;
-            
-                        {{GenerateClientMethods(clientType)}}
-                    }
+                public IListener On { get; }
+                public IInvoker Invoke { get; }
+                public ISender Send { get; }
+        
+                public {{classSymbol.Name}}(HubConnection connection)
+                {
+                    On = new Listener(connection);
+                    Send = new Sender(connection);
+                    Invoke = new Invoker(connection);
+                }
+        
+                private class Sender : ISender
+                {
+                    private readonly HubConnection _c;
+                    public Sender(HubConnection c) => _c = c;
+        
+                    {{GenerateServerMethods(hubType, "SendCoreAsync")}}
+                }
+        
+                private class Invoker : IInvoker
+                {
+                    private readonly HubConnection _c;
+                    public Invoker(HubConnection c) => _c = c;
+        
+                    {{GenerateServerMethods(hubType, "InvokeCoreAsync")}}
+                }
+        
+                private class Listener : IListener
+                {
+                    private readonly HubConnection _c;
+                    public Listener(HubConnection c) => _c = c;
+        
+                    {{GenerateClientMethods(clientType)}}
                 }
             }
-            """);
+        }
+        """);
+}
+
+private string GenerateServerMethodsInterface(ITypeSymbol hubType)
+{
+    var methods = new StringBuilder();
+    
+    foreach (var member in hubType.GetMembers())
+    {
+        if (member is not IMethodSymbol method) continue;
+        
+        var parameters = string.Join(", ", method.Parameters
+            .Select(p => $"{p.Type} {p.Name}"));
+            
+        if (parameters.Length > 0)
+            parameters += ", ";
+
+        methods.AppendLine($"Task {method.Name}({parameters}CancellationToken cancellationToken = default);");
     }
+
+    return methods.ToString();
+}
+
+private string GenerateClientMethodsInterface(ITypeSymbol clientType)
+{
+    var methods = new StringBuilder();
+    
+    foreach (var member in clientType.GetMembers())
+    {
+        if (member is not IMethodSymbol method) continue;
+        
+        var delegateParameters = string.Join(", ", method.Parameters
+            .Select(p => $"{p.Type} {p.Name}"));
+            
+        methods.AppendLine($"IDisposable {method.Name}(Func<{delegateParameters}, Task> handler);");
+    }
+
+    return methods.ToString();
+}
 
     private string GenerateServerMethods(ITypeSymbol hubType, string methodType)
     {
