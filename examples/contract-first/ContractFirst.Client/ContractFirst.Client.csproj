@@ -5,15 +5,20 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\src\Typhoon.AspNetCore.SignalR.Client.Generator\Typhoon.AspNetCore.SignalR.Client.Generator.csproj" />
+      <ProjectReference Include="..\..\..\src\Typhoon.AspNetCore.SignalR.Client.Generator\Typhoon.AspNetCore.SignalR.Client.Generator.csproj"
+                        OutputItemType="Analyzer"/>
+        
+        
       <ProjectReference Include="..\ContractFirst.Shared\ContractFirst.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0"/>
     </ItemGroup>
 
 </Project>

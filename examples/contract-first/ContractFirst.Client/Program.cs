@@ -6,6 +6,7 @@ await using var connection = new HubConnectionBuilder()
     .Build();
 
 var proxy = new ChatHubProxy(connection);
+//var proxy2 = new ChatHubProxy2(connection);
 
 proxy.On.ReceiveMessageAsync(msg =>
 { 

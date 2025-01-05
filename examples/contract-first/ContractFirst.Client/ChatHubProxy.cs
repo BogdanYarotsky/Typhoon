@@ -1,17 +1,22 @@
 using ContractFirst.Shared;
 using Microsoft.AspNetCore.SignalR.Client;
 using Typhoon.AspNetCore.SignalR.Client.Generator;
+using Typhoon.AspNetCore.SignalR.Client.Generator.Attributes;
 
 namespace ContractFirst.Client;
 
 [HubInvoker<IChatHub>]
 [HubListener<IChatHubClient>]
-public partial class ChatHubProxy
+public partial class ChatHubProxy2
+{
+}
+
+public class ChatHubProxy
 {
     // all code below should be source-generated based on the attributes above
     public Listener On { get; }
     public Invoker Invoke { get; }
-    public Sender Send { get;}
+    public Sender Send { get; }
 
     public ChatHubProxy(HubConnection connection)
     {
