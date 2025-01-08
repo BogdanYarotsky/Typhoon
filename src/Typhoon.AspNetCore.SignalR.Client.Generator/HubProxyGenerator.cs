@@ -5,8 +5,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Typhoon.AspNetCore.SignalR.Client.Generator;
 
-[Generator]
-public class HubProxyGenerator : ISourceGenerator
+public class HubProxyGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {

@@ -1,15 +1,6 @@
-using ContractFirst.Shared;
 using Microsoft.AspNetCore.SignalR.Client;
-using Typhoon.AspNetCore.SignalR.Client.Generator.Attributes;
 
 namespace ContractFirst.Client;
-
-[HubSender<IChatHub>]
-[HubInvoker<IChatHub>]
-[HubListener<IChatHubClient>]
-public partial class ChatHubProxy2
-{
-}
 
 public class ChatHubProxy
 {
